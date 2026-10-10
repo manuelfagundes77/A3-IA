@@ -3,15 +3,20 @@ import pickle
 import warnings
 warnings.filterwarnings('ignore')
 
+import os
+from config_versoes import VERSAO_ATIVA, pasta_modelos
+
 def carregar_modelos():
-    with open('modelos_v1/classificador_vencedor.pkl', 'rb') as f:
+    # Somente leitura: pode usar versões finalizadas sem risco
+    pasta_mod = pasta_modelos(VERSAO_ATIVA)
+    with open(os.path.join(pasta_mod, 'classificador_vencedor.pkl'), 'rb') as f:
         classificador = pickle.load(f)
         
-    with open('modelos_v1/regressor_gols.pkl', 'rb') as f:
+    with open(os.path.join(pasta_mod, 'regressor_gols.pkl'), 'rb') as f:
         regressor = pickle.load(f)
         
     # Agora carregamos o histórico completo para extrair o momento mais recente
-    with open('modelos_v1/historico_estado.pkl', 'rb') as f:
+    with open(os.path.join(pasta_mod, 'historico_estado.pkl'), 'rb') as f:
         estado = pickle.load(f)
         
     return classificador, regressor, estado

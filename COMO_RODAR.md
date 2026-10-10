@@ -40,3 +40,22 @@ cd ml
 ### 🧠 Dica de Ouro
 Se você tentar rodar o comando `python treino.py` estando na pasta raiz, ele vai dar erro dizendo que não achou o arquivo. Você precisa sempre entrar na pasta certa (`cd ml`) e só depois rodar o comando!
 
+
+---
+
+## 3. Instalação (Primeiro Acesso / Baixado do GitHub)
+
+Se você acabou de baixar este projeto do GitHub em outro PC, você precisará instalar as dependências (bibliotecas) para que os arquivos funcionem.
+
+Certifique-se de ter o Python instalado. Então, abra o terminal na **pasta raiz** do projeto (`A3 IA`) e execute:
+
+```bash
+pip install -r api/requirements.txt
+```
+
+*(Isso instalará automaticamente: fastapi, uvicorn, pandas, scikit-learn e numpy)*
+
+Caso prefira instalar manualmente, execute:
+```bash
+pip install fastapi uvicorn pandas scikit-learn numpy
+```

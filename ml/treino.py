@@ -7,6 +7,10 @@ import os
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
+from config_versoes import (
+    VERSAO_ATIVA, PASTA_ML, pasta_modelos, pasta_graficos_treino,
+    arquivo_resultados_teste, bloquear_se_protegida
+)
 
 def calcular_features_e_historico(df):
     times = pd.concat([df['Home'], df['Away']]).unique()
@@ -113,11 +117,14 @@ def calcular_features_e_historico(df):
 
 
 def main():
+    if bloquear_se_protegida(VERSAO_ATIVA, "treinar modelo"):
+        return
+
     print("=" * 55)
-    print("  Treinamento V1 - Com Medias Historicas de Casa/Fora")
+    print(f"  Treinamento {VERSAO_ATIVA.upper()} - Com Medias Historicas de Casa/Fora")
     print("=" * 55)
 
-    dados = pd.read_csv('dados/BRA.csv')
+    dados = pd.read_csv(os.path.join(PASTA_ML, 'dados', 'BRA.csv'))
     dados.dropna(subset=['Season', 'Date', 'Home', 'Away', 'HG', 'AG', 'Res'], inplace=True)
     dados['Date'] = pd.to_datetime(dados['Date'], format='%d/%m/%Y')
     dados = dados.sort_values('Date')
@@ -153,14 +160,14 @@ def main():
     regressor_gols = RandomForestRegressor(n_estimators=200, max_depth=7, random_state=42)
     regressor_gols.fit(X_treino, y_reg_treino)
 
-    # Salvar modelos e histórico completo
-    import os
-    os.makedirs('modelos_v1', exist_ok=True)
-    with open('modelos_v1/classificador_vencedor.pkl', 'wb') as f:
+    # Salvar modelos e histórico completo na pasta da versão ativa
+    pasta_mod = pasta_modelos(VERSAO_ATIVA)
+    os.makedirs(pasta_mod, exist_ok=True)
+    with open(os.path.join(pasta_mod, 'classificador_vencedor.pkl'), 'wb') as f:
         pickle.dump(classificador_vencedor, f)
-    with open('modelos_v1/regressor_gols.pkl', 'wb') as f:
+    with open(os.path.join(pasta_mod, 'regressor_gols.pkl'), 'wb') as f:
         pickle.dump(regressor_gols, f)
-    with open('modelos_v1/historico_estado.pkl', 'wb') as f:
+    with open(os.path.join(pasta_mod, 'historico_estado.pkl'), 'wb') as f:
         pickle.dump({
             'historico_times': historico_times,
             'historico_em_casa': historico_em_casa,
@@ -207,8 +214,9 @@ def main():
         'gols_reais': y_reg_teste,
         'gols_previstos': pred_reg_teste
     })
-    resultados.to_csv('resultados_2024.csv', index=False)
-    print("\nArquivo resultados_2024.csv atualizado.")
+    caminho_resultados = arquivo_resultados_teste(VERSAO_ATIVA)
+    resultados.to_csv(caminho_resultados, index=False)
+    print(f"\nArquivo {os.path.basename(caminho_resultados)} atualizado.")
 
     # Gerar gráficos automáticos da fase de treinamento na pasta graficos_treino_v1
     gerar_graficos_treino(
@@ -242,7 +250,7 @@ MAPA_NOMES_FEATURES = {
 
 
 def gerar_graficos_treino(classificador, regressor, features, acc_treino, acc_teste, erro_treino, erro_teste, y_reg_treino, pred_reg_treino):
-    pasta = 'graficos_treino_v1'
+    pasta = pasta_graficos_treino(VERSAO_ATIVA)
     os.makedirs(pasta, exist_ok=True)
     print(f"\n" + "=" * 55)
     print(f"  Gerando Graficos de Treinamento em '{pasta}/'...")

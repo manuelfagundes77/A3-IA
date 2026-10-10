@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import pandas as pd
-from api.modelos import obter_classificador, obter_regressor, obter_estado
+from api.modelos import obter_modelos, versoes_disponiveis, VERSAO_PADRAO
 
 roteador = APIRouter()
 
@@ -10,6 +10,7 @@ class PedidoPrevisao(BaseModel):
     """Modelo do JSON que o frontend envia."""
     time_casa: str
     time_fora: str
+    versao: str = VERSAO_PADRAO
 
 
 def calcular_confianca(chance_maxima):
@@ -25,9 +26,15 @@ def calcular_confianca(chance_maxima):
 @roteador.post("/api/previsao")
 def fazer_previsao(pedido: PedidoPrevisao):
     """Recebe dois times e retorna a previsão completa com Raio-X."""
-    classificador = obter_classificador()
-    regressor = obter_regressor()
-    estado = obter_estado()
+    modelos = obter_modelos(pedido.versao)
+    if modelos is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Versao '{pedido.versao}' nao disponivel. Disponiveis: {versoes_disponiveis()}"
+        )
+    classificador = modelos["classificador"]
+    regressor = modelos["regressor"]
+    estado = modelos["estado"]
 
     time_casa = pedido.time_casa
     time_fora = pedido.time_fora

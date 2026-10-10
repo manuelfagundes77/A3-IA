@@ -3,4 +3,4 @@ uvicorn
 pandas
 scikit-learn
 numpy
-
+matplotlib

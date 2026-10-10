@@ -16,7 +16,12 @@ plt.rcParams['axes.titlecolor'] = 'white'
 plt.rcParams['axes.edgecolor'] = '#0f3460'
 plt.rcParams['font.family'] = 'DejaVu Sans'
 
-PASTA_SAIDA = 'graficos_aula'
+from config_versoes import (
+    VERSAO_ATIVA, pasta_graficos_teste, arquivo_resultados_teste, bloquear_se_protegida
+)
+
+PASTA_SAIDA = pasta_graficos_teste(VERSAO_ATIVA)
+ARQUIVO_RESULTADOS = arquivo_resultados_teste(VERSAO_ATIVA)
 COR_DESTAQUE = '#e94560'
 COR_SECUNDARIA = '#0f3460'
 COR_VERDE = '#4ade80'
@@ -29,11 +34,11 @@ def garantir_pasta():
 
 def carregar_dados():
     try:
-        resultados = pd.read_csv('resultados_2024.csv')
+        resultados = pd.read_csv(ARQUIVO_RESULTADOS)
         print(f"Dados carregados: {len(resultados)} jogos no teste real (2024+).")
         return resultados
     except FileNotFoundError:
-        print("ERRO: Execute 'python treino.py' primeiro para gerar os dados de teste.")
+        print(f"ERRO: {ARQUIVO_RESULTADOS} nao encontrado. Execute 'python treino.py' primeiro.")
         return None
 
 # ====================================================
@@ -230,8 +235,11 @@ def grafico_resumo_metricas(resultados):
     print(f"  -> Salvo em: {caminho}")
 
 def main():
+    if bloquear_se_protegida(VERSAO_ATIVA, "regerar graficos do teste real"):
+        return
+
     print("=" * 55)
-    print("  Gerando Relatorio Visual para Apresentacao")
+    print(f"  Gerando Relatorio Visual {VERSAO_ATIVA.upper()} para Apresentacao")
     print("=" * 55)
 
     garantir_pasta()

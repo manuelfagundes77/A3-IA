@@ -3,15 +3,19 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import os
 
+from config_versoes import VERSAO_ATIVA, arquivo_resultados_teste, versao_esta_protegida
+
 def main():
-    print("Rodando treino.py para gerar previsões atualizadas...")
-    # Executa o script de treino
-    os.system("python treino.py")
+    # Só retreina se a versão não estiver protegida (senão usa os resultados já salvos)
+    if not versao_esta_protegida(VERSAO_ATIVA):
+        print("Rodando treino.py para gerar previsões atualizadas...")
+        os.system("python treino.py")
     
+    caminho_resultados = arquivo_resultados_teste(VERSAO_ATIVA)
     try:
-        resultados = pd.read_csv('resultados_2024.csv')
+        resultados = pd.read_csv(caminho_resultados)
     except FileNotFoundError:
-        print("Erro: Arquivo resultados_2024.csv não encontrado.")
+        print(f"Erro: Arquivo {caminho_resultados} não encontrado.")
         return
 
     # Gráfico 1: Matriz de Confusão (acertos/erros por classe)

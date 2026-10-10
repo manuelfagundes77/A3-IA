@@ -1,22 +1,23 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import pandas as pd
 import os
-from api.modelos import obter_caminho_ml
+from api.modelos import obter_caminho_resultados, VERSAO_PADRAO
 
 roteador = APIRouter()
 
 
 @roteador.get("/api/metricas")
-def obter_metricas():
+def obter_metricas(versao: str = VERSAO_PADRAO):
     """Retorna as métricas de performance do modelo no teste real (2024+)."""
-    caminho_csv = os.path.join(obter_caminho_ml(), 'resultados_2024.csv')
+    caminho_csv = obter_caminho_resultados(versao)
 
     try:
         resultados = pd.read_csv(caminho_csv)
     except FileNotFoundError:
-        return {
-            "erro": "Arquivo resultados_2024.csv nao encontrado. Execute 'python treino.py' primeiro."
-        }
+        raise HTTPException(
+            status_code=404,
+            detail=f"Resultados da versao '{versao}' nao encontrados ({os.path.basename(caminho_csv)}). Execute 'python treino.py' primeiro."
+        )
 
     total_jogos = len(resultados)
 
