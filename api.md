@@ -69,7 +69,11 @@ Este documento define a arquitetura e os endpoints do backend que ser√° constru√
     "chance_empate_pct": 19.5,
     "chance_fora_pct": 19.0,
     "total_gols_esperados": 2.43,
-    "confianca": "Alta"
+    "placar_provavel": "2 x 1",
+    "media_gols_casa": 2.15,
+    "media_gols_fora": 1.05,
+    "confianca": "Alta",
+    "confianca_pct": 61.5
   }
 }
 ```

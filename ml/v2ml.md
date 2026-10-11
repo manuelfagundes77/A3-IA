@@ -69,25 +69,7 @@ V2 (+ 3 novas):
 
 ## 4. Estrutura de Arquivos da V2
 
-Para não sobrescrever a V1, os modelos serão salvos em pastas separadas:
 
-```
-ml/
-├── modelos/
-│   ├── v1/
-│   │   ├── classificador_vencedor.pkl
-│   │   ├── regressor_gols.pkl
-│   │   └── historico_estado.pkl
-│   └── v2/
-│       ├── classificador_vencedor.pkl
-│       ├── regressor_gols.pkl
-│       └── historico_estado.pkl
-│
-├── treino_v2.py       ← novo script de treino da V2
-└── predicoes.py       ← escolhe a versão com VERSAO = 'v1' ou 'v2'
-```
-
----
 
 ## 5. Atenção: Limitação das Odds
 

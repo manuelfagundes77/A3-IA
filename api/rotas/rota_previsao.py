@@ -111,6 +111,34 @@ def fazer_previsao(pedido: PedidoPrevisao):
 
     chance_maxima = max(chance_casa, chance_empate, chance_fora)
 
+    # --- Placar Mais Provável ---
+    # Distribuição baseada na força de ataque vs defesa histórica dos mandos
+    forca_ataque_casa = home_hist_gf_casa + away_hist_ga_fora
+    forca_ataque_fora = away_hist_gf_fora + home_hist_ga_casa
+
+    total_forca = forca_ataque_casa + forca_ataque_fora
+    if total_forca > 0:
+        gols_esperados_casa = pred_gols * (forca_ataque_casa / total_forca)
+        gols_esperados_fora = pred_gols * (forca_ataque_fora / total_forca)
+    else:
+        gols_esperados_casa = pred_gols / 2
+        gols_esperados_fora = pred_gols / 2
+
+    placar_casa = round(gols_esperados_casa)
+    placar_fora = round(gols_esperados_fora)
+
+    # Ajuste fino para o placar não contradizer o palpite do classificador
+    if pred_classe == 'H' and placar_casa <= placar_fora:
+        placar_casa = placar_fora + 1
+    elif pred_classe == 'A' and placar_fora <= placar_casa:
+        placar_fora = placar_casa + 1
+    elif pred_classe == 'D' and placar_casa != placar_fora:
+        media = (placar_casa + placar_fora) // 2
+        placar_casa = media
+        placar_fora = media
+        
+    placar_provavel = f"{placar_casa} x {placar_fora}"
+
     # Palpite em texto
     if pred_classe == 'H':
         palpite = f"Vitoria do(a) {time_casa} (Casa)"
@@ -144,7 +172,11 @@ def fazer_previsao(pedido: PedidoPrevisao):
             "chance_empate_pct": chance_empate,
             "chance_fora_pct": chance_fora,
             "total_gols_esperados": round(pred_gols, 2),
-            "confianca": calcular_confianca(chance_maxima)
+            "placar_provavel": placar_provavel,
+            "media_gols_casa": round(home_hist_gf_casa, 2),
+            "media_gols_fora": round(away_hist_gf_fora, 2),
+            "confianca": calcular_confianca(chance_maxima),
+            "confianca_pct": chance_maxima
         }
     }
 

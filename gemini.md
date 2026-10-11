@@ -105,10 +105,11 @@ A3 IA/
   4. `POST /api/previsao`: Recebe `{"time_casa": "...", "time_fora": "...", "versao": "v1"}` (`versao` opcional), processa as 13 features com base no histórico e retorna:
      - Raio-X comparativo de momento atual.
      - Retrospecto de confronto direto.
-     - Palpite do vencedor, probabilidades percentuais (Casa, Empate, Fora), expectativa de gols e selo de confiança:
+     - Palpite do vencedor, probabilidades percentuais (Casa, Empate, Fora), expectativa de gols, placar provável, médias de gols (mando) e selo de confiança:
        - **Alta:** probabilidade máxima > 60%.
        - **Média:** probabilidade máxima entre 50% e 60%.
        - **Baixa:** probabilidade máxima < 50%.
+       - **Campos adicionais para o mockup:** `placar_provavel` (ex: "1 x 1"), `media_gols_casa`, `media_gols_fora` e `confianca_pct`.
   5. `GET /api/metricas?versao=v1`: Lê `resultados_teste_vX.csv` e retorna dinamicamente a taxa de acerto real e o erro médio de gols.
   - Versão inexistente retorna **HTTP 404** com mensagem clara.
 
@@ -122,7 +123,7 @@ A3 IA/
 | 2 | Gráficos/Relatórios | Matrizes de confusão e relatórios visuais | ✅ Concluído |
 | 3 | Backend API | FastAPI com rotas `/api/times`, `/api/previsao` e `/api/metricas` | ✅ Concluído |
 | 4 | Frontend | Interface React consumindo a API com visual moderno | 🔄 **A Fazer** |
-| 5 | ML V2 | Inclusão de Odds da Bet365 e Probabilidade Implícita | 📝 Planejado |
+| 5 | ML V2 | Pasta autônoma `ml/v2/` com XGBoost (500 árvores) e 16 features (Odds Bet365/Mercado) | ✅ Concluído |
 
 ---
 
@@ -137,18 +138,17 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 - Endpoint de times: [http://127.0.0.1:8000/api/times](http://127.0.0.1:8000/api/times)
 
 ### Retreinar o Modelo de Machine Learning:
-```bash
-cd ml
-python treino.py
-```
-
-### Gerar os Gráficos de Avaliação:
-```bash
-cd ml
-python relatorio_visual.py
-# ou para visualização interativa com plt.show():
-python graficos.py
-```
+* **Versão V1 (Random Forest):**
+  ```bash
+  cd ml
+  python treino.py
+  ```
+* **Versão V2 (XGBoost com Odds):**
+  ```bash
+  cd ml/v2
+  python treino.py
+  python relatorio_visual.py
+  ```
 
 ---
 
@@ -162,6 +162,10 @@ python graficos.py
 | **08/10/2026** | Equipe / IA | Organização de Modelos V1 | Movidos todos os arquivos `.pkl` para a nova pasta `ml/modelos_v1/`. Atualizados `treino.py`, `predicoes.py` e `api/modelos.py` para suportar o novo caminho estrutural. Preparação para a V2. |
 | **08/10/2026** | Equipe / IA | Separação de Gráficos (Treino vs Teste Real) | Criada geração automática de gráficos da fase de aprendizado da V1 em `ml/graficos_treino_v1/` diretamente no `treino.py`. Mantida pasta `ml/graficos_aula/` com gráficos do Teste Real (2024+) atualizados para os 50.24% da V1. |
 | **10/10/2026** | Equipe / IA | Versionamento V1/V2 e Proteção | Criado `ml/config_versoes.py` (VERSAO_ATIVA + VERSOES_FINALIZADAS). V1 congelada: `treino.py` e `relatorio_visual.py` bloqueiam sobrescrita. Renomeados `graficos_aula/` → `graficos_teste_v1/` e `resultados_2024.csv` → `resultados_teste_v1.csv`. API carrega V1/V2 e aceita parâmetro `versao`; nova rota `GET /api/versoes`. Adicionado `matplotlib` ao `requirements.txt`. |
+| **10/10/2026** | Equipe / IA | Suporte ao Mockup no Backend | Expandida a rota `/api/previsao` com `placar_provavel`, `media_gols_casa`, `media_gols_fora` e `confianca_pct`, alinhando os dados da API diretamente com o design de interface planejado. |
+| **10/10/2026** | Equipe / IA | Implementação e Treinamento do ML V2 (XGBoost) | Criada pasta 100% autônoma `ml/v2/`. Instalado `xgboost`, adicionadas 3 novas features de probabilidade implícita de odds (16 no total). Treinado ensemble de 500 árvores. Acurácia no teste real (2024+) subiu para 50.72%. |
+| **10/10/2026** | Equipe / IA | Otimização Anti-Overfitting da V2 | Aplicadas features diferenciais (25 features no total), normalização de odds sem o vig e poda regularizada no XGBoost. Acurácia no teste real (2024+) subiu para **52.94%** e o gap de overfitting despencou de 18.28% para **3.30%** (saudável). Atualizados relatórios visuais Dark Mode. |
+| **10/10/2026** | Equipe / IA | Tuning a Pedido do Usuário (V2) | Usuário solicitou relaxamento da regularização para que o modelo pudesse "aprender mais" no treino. Ajustamos hyperparameters (`max_depth=6`, `learning_rate=0.01`, `n_estimators=1000`, `gamma=1.0`) para bater ~70% de acurácia no Treino (alcançado **69.40%**). No Teste Real (2024+), a acurácia ficou em sólidos **52.07%** (muito acima do baseline V1 e do aleatório). Gráficos Dark Mode atualizados. |
 
 ---
 
