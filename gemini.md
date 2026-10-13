@@ -166,6 +166,7 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 | **10/10/2026** | Equipe / IA | Implementação e Treinamento do ML V2 (XGBoost) | Criada pasta 100% autônoma `ml/v2/`. Instalado `xgboost`, adicionadas 3 novas features de probabilidade implícita de odds (16 no total). Treinado ensemble de 500 árvores. Acurácia no teste real (2024+) subiu para 50.72%. |
 | **10/10/2026** | Equipe / IA | Otimização Anti-Overfitting da V2 | Aplicadas features diferenciais (25 features no total), normalização de odds sem o vig e poda regularizada no XGBoost. Acurácia no teste real (2024+) subiu para **52.94%** e o gap de overfitting despencou de 18.28% para **3.30%** (saudável). Atualizados relatórios visuais Dark Mode. |
 | **10/10/2026** | Equipe / IA | Tuning a Pedido do Usuário (V2) | Usuário solicitou relaxamento da regularização para que o modelo pudesse "aprender mais" no treino. Ajustamos hyperparameters (`max_depth=6`, `learning_rate=0.01`, `n_estimators=1000`, `gamma=1.0`) para bater ~70% de acurácia no Treino (alcançado **69.40%**). No Teste Real (2024+), a acurácia ficou em sólidos **52.07%** (muito acima do baseline V1 e do aleatório). Gráficos Dark Mode atualizados. |
+| **13/10/2026** | Equipe / IA | Mockup de Arte Visual (Taste Skill) | Criado mockup em alta definição (`modelofront/mockup_taste.jpg`) elevando a referência visual do projeto (`porjetoML.jpg`) sob as diretrizes anti-slop da skill taste: eliminação de neons/blurs genéricos e adoção de identidade editorial esportiva premium. |
 
 ---
 
