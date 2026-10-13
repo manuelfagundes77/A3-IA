@@ -50,12 +50,7 @@ Se você acabou de baixar este projeto do GitHub em outro PC, você precisará i
 Certifique-se de ter o Python instalado. Então, abra o terminal na **pasta raiz** do projeto (`A3 IA`) e execute:
 
 ```bash
-pip install -r api/requirements.txt
+pip install -r requirements.txt
 ```
 
-*(Isso instalará automaticamente: fastapi, uvicorn, pandas, scikit-learn e numpy)*
-
-Caso prefira instalar manualmente, execute:
-```bash
-pip install fastapi uvicorn pandas scikit-learn numpy
-```
+*(Isso instalará automaticamente todas as dependências da API e do Machine Learning: fastapi, uvicorn, pandas, scikit-learn, numpy, matplotlib e xgboost)*

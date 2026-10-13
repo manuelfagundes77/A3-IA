@@ -1,0 +1,20 @@
+# ==============================================================================
+# DEPENDÊNCIAS DO PROJETO: ML-PALPITES (A3 IA)
+# Para instalar tudo de uma única vez no ambiente:
+# pip install -r requirements.txt
+# ==============================================================================
+
+# Servidor e Backend REST (FastAPI)
+fastapi
+uvicorn
+
+# Tratamento e Manipulação de Dados
+pandas
+numpy
+
+# Machine Learning (V1: Random Forest | V2: XGBoost com Odds)
+scikit-learn
+xgboost
+
+# Geração de Gráficos e Relatórios Visuais
+matplotlib

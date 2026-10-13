@@ -22,6 +22,7 @@
 1. **Idioma estrito:** TODAS as variáveis, funções, classes, rotas, comentários e mensagens devem ser em **Português do Brasil (PT-BR)**.
 2. **Modularidade:** Manter separadas as responsabilidades entre Machine Learning (`/ml`), Backend (`/api`) e Frontend (`/frontend`).
 3. **Eficiência no Backend:** Os arquivos `.pkl` devem ser carregados para a memória RAM apenas uma vez no startup da API (`api/modelos.py`), garantindo inferência instantânea nas requisições.
+4. **Git e Versionamento (GitHub Desktop):** O usuário NÃO utiliza comandos de terminal para Git, utilizando exclusivamente o **GitHub Desktop**. A IA **NUNCA** deve executar comandos `git` no terminal (como `git status`, `git add`, `git commit`, `git push`, etc.) nem sugerir fluxos de terminal para git. O versionamento é de controle manual do usuário via interface gráfica.
 
 ---
 
@@ -33,6 +34,8 @@ A3 IA/
 ├── README_IA.md                  # Contexto inicial e diretrizes gerais
 ├── api.md                        # Especificação técnica e contratos dos endpoints
 ├── COMO_RODAR.md                 # Guia prático de comandos de terminal
+├── requirements.txt              # Dependências gerais do projeto (API + ML V1 + ML V2)
+├── .gitignore                    # Bloqueio de subida de arquivos desnecessários pro GitHub
 │
 ├── ml/                           # Módulo de Inteligência Artificial
 │   ├── dados/
@@ -43,23 +46,23 @@ A3 IA/
 │   ├── relatorio_visual.py       # Gerador de gráficos dark mode de apresentação
 │   ├── ml.md                     # Planejamento e métricas da versão V1
 │   ├── v2ml.md                   # Planejamento da futura versão V2 (Odds/Bet365)
-│   ├── modelos_v1/                   # Modelos gerados e estado salvo da V1
+│   ├── modelos_v1/               # Modelos gerados e estado salvo da V1
 │   │   ├── classificador_vencedor.pkl # Modelo Random Forest Classifier treinado
-│   │   ├── regressor_gols.pkl        # Modelo Random Forest Regressor treinado
-│   │   ├── estatisticas_times.pkl    # Estatisticas antigas
-│   │   └── historico_estado.pkl      # Dicionários de histórico dos times e confrontos diretos
+│   │   ├── regressor_gols.pkl    # Modelo Random Forest Regressor treinado
+│   │   ├── estatisticas_times.pkl# Estatisticas antigas
+│   │   └── historico_estado.pkl  # Dicionários de histórico dos times e confrontos diretos
 │   ├── graficos_treino_v1/       # Gráficos da etapa de treino/aprendizado gerados pelo treino.py
 │   │   ├── 1_importancia_features.png
 │   │   ├── 2_treino_vs_validacao.png
 │   │   └── 3_diagnostico_gols_treino.png
 │   ├── config_versoes.py         # VERSAO_ATIVA, caminhos por versão e regra de proteção (VERSOES_FINALIZADAS)
 │   ├── resultados_teste_v1.csv   # Previsões vs resultados reais (teste 2024+) da V1
-│   └── graficos_teste_v1/        # Gráficos do teste real (2024+) da V1 gerados pelo relatorio_visual.py
+│   ├── graficos_teste_v1/        # Gráficos do teste real (2024+) da V1 gerados pelo relatorio_visual.py
+│   └── v2/                       # Módulo autônomo da versão V2 (XGBoost com Odds)
 │
 └── api/                          # Módulo Backend REST (FastAPI)
     ├── main.py                   # Ponto de entrada da API, configuração de CORS e rotas
     ├── modelos.py                # Gerenciador de carregamento dos arquivos .pkl em memória
-    ├── requirements.txt          # Dependências do backend (fastapi, uvicorn, pandas, etc.)
     └── rotas/
         ├── __init__.py
         ├── rota_times.py         # GET /api/times (Listagem para dropdowns)
@@ -167,6 +170,9 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 | **10/10/2026** | Equipe / IA | Otimização Anti-Overfitting da V2 | Aplicadas features diferenciais (25 features no total), normalização de odds sem o vig e poda regularizada no XGBoost. Acurácia no teste real (2024+) subiu para **52.94%** e o gap de overfitting despencou de 18.28% para **3.30%** (saudável). Atualizados relatórios visuais Dark Mode. |
 | **10/10/2026** | Equipe / IA | Tuning a Pedido do Usuário (V2) | Usuário solicitou relaxamento da regularização para que o modelo pudesse "aprender mais" no treino. Ajustamos hyperparameters (`max_depth=6`, `learning_rate=0.01`, `n_estimators=1000`, `gamma=1.0`) para bater ~70% de acurácia no Treino (alcançado **69.40%**). No Teste Real (2024+), a acurácia ficou em sólidos **52.07%** (muito acima do baseline V1 e do aleatório). Gráficos Dark Mode atualizados. |
 | **13/10/2026** | Equipe / IA | Mockup de Arte Visual (Taste Skill) | Criado mockup em alta definição (`modelofront/mockup_taste.jpg`) elevando a referência visual do projeto (`porjetoML.jpg`) sob as diretrizes anti-slop da skill taste: eliminação de neons/blurs genéricos e adoção de identidade editorial esportiva premium. |
+| **13/10/2026** | Equipe / IA | Preparação para o GitHub | Criação do `.gitignore` (bloqueando `venv`, `__pycache__` e temporários) e atualização do `api/requirements.txt` com inclusão do `xgboost` para suportar V1 e V2. |
+| **13/10/2026** | Usuário / IA | Preferência por GitHub Desktop | Salva regra permanente: o usuário utiliza exclusivamente o GitHub Desktop (GUI); a IA nunca deve executar nem propor comandos `git` no terminal. |
+| **13/10/2026** | Usuário / IA | Centralização do requirements.txt | Movido e organizado `requirements.txt` na raiz do projeto (cobrindo FastAPI, ML V1 e V2 com seções comentadas), facilitando instalação direta e leitura por IAs e ambientes. |
 
 ---
 
