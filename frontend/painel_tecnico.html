@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ML-Palpites | Painel Técnico e Diagnóstico de Modelos (IA)</title>
+    <!-- Fonte Inter para padrão visual Editorial Esportivo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+
+    <!-- ==================== CABEÇALHO SUPERIOR ==================== -->
+    <header class="cabecalho-topo">
+        <div class="cabecalho-conteudo">
+            <div class="marca-container">
+                <svg class="icone-marca" viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M2 25V4L11.5 16.5L16 10.5" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 10.5L20.5 16.5L30 4V25" stroke="#18A963" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div>
+                    <span class="titulo-marca">ML-PALPITES</span>
+                    <span class="divisor-marca">|</span>
+                    <span class="subtitulo-marca">Painel Técnico de Machine Learning &amp; Requisitos da API</span>
+                </div>
+            </div>
+
+            <!-- Botão para voltar à página principal -->
+            <a href="index.html" class="botao-voltar" id="btn-voltar-simulador" title="Retornar ao Simulador Principal de Partidas">
+                <span>←</span> Voltar ao Simulador Principal
+            </a>
+        </div>
+    </header>
+
+    <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
+    <main class="container-painel-tecnico">
+
+        <!-- Barra de Título e Contexto -->
+        <div class="barra-retorno">
+            <div>
+                <h1 class="titulo-pagina-tecnica">
+                    <span>⚙️</span> Painel Técnico de Avaliação
+                </h1>
+                <p class="subtitulo-pagina-tecnica">
+                    Clique no cabeçalho de qualquer card para <strong>abrir ou fechar</strong> (deixando só o título). Inspecione <code>/predict-rule</code>, <code>/forecast</code>, <code>/model-info</code> e <code>/explain</code>.
+                </p>
+            </div>
+            <div class="acoes-topo-card">
+                <button type="button" class="botao-abre-fecha-card" onclick="alternarTodosOsCards(false)" title="Deixar todos os cards apenas com o título">
+                    ▲ Fechar Todos
+                </button>
+                <button type="button" class="botao-abre-fecha-card" onclick="alternarTodosOsCards(true)" title="Abrir todos os cards">
+                    ▼ Abrir Todos
+                </button>
+            </div>
+        </div>
+
+        <!-- FAIXA DE CONTROLE: SELEÇÃO RÁPIDA DE CONFRONTO E VERSÃO DO MODELO -->
+        <section class="faixa-controle-painel" aria-label="Controle de Simulação">
+            <div class="grupo-controles-times">
+                <label for="select-painel-casa" style="font-size: 0.8rem; font-weight: 700; color: #4ade80;">MANDANTE:</label>
+                <select id="select-painel-casa" class="select-painel" onchange="aoTrocarTimePainel()"></select>
+
+                <button type="button" class="botao-inverter" onclick="inverterTimesPainel()" title="Inverter Mando de Campo" style="padding: 6px 10px;">
+                    ⇄
+                </button>
+
+                <label for="select-painel-fora" style="font-size: 0.8rem; font-weight: 700; color: #f87171;">VISITANTE:</label>
+                <select id="select-painel-fora" class="select-painel" onchange="aoTrocarTimePainel()"></select>
+            </div>
+
+            <!-- Seletor de Versão -->
+            <div class="acoes-cabecalho">
+                <div class="seletor-versao-container" role="group" aria-label="Selecionar Motor de IA">
+                    <button type="button" id="btn-painel-v1" class="botao-versao ativo" onclick="selecionarVersaoPainel('v1')">
+                        <span class="ponto-versao"></span>
+                        V1 • Random Forest
+                    </button>
+                    <button type="button" id="btn-painel-v2" class="botao-versao" onclick="selecionarVersaoPainel('v2')">
+                        <span class="ponto-versao"></span>
+                        V2 • XGBoost + Odds
+                    </button>
+                </div>
+
+                <button type="button" class="botao-recalcular-painel" onclick="executarDiagnosticoCompleto()">
+                    RECALCULAR
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== CARD 1: REGRA FIXA VS MACHINE LEARNING (/predict-rule) ==================== -->
+        <section class="card-secao-tecnica recolhido" id="card-predict-rule" aria-label="Comparativo Regra Fixa vs ML">
+            <div class="topo-card-tecnico" onclick="alternarCardTecnico('card-predict-rule')">
+                <div>
+                    <h2 class="titulo-card-tecnico">1. Regra Fixa vs. Machine Learning</h2>
+                    <p class="descricao-card-tecnico">
+                        Comparação direta do mesmo confronto resolvido por uma regra heurística fixa (<code>if / else</code> manual) contra os modelos de Machine Learning.
+                    </p>
+                </div>
+                <div class="acoes-topo-card">
+                    <a id="link-externo-predict-rule" href="http://127.0.0.1:8000/predict-rule?time_casa=Palmeiras&time_fora=Flamengo%20RJ&versao=v1" target="_blank" rel="noopener noreferrer" class="link-rota-externa" onclick="event.stopPropagation()" title="Abrir JSON puro desta rota diretamente em uma nova aba do navegador">
+                        <span>🔗 Abrir Rota JSON</span>
+                        <span class="url-rota-tag" id="tag-url-predict-rule">GET /predict-rule</span>
+                        <span>↗</span>
+                    </a>
+                    <button type="button" class="botao-abre-fecha-card" aria-label="Alternar exibição do card">
+                        <span class="texto-abre-fecha">Abrir</span>
+                        <span class="seta-abre-fecha">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="corpo-card-tecnico">
+                <!-- Indicador de Concordância -->
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                    <span style="font-size: 0.85rem; color: var(--texto-secundario);">
+                        Confronto avaliado: <strong id="lbl-confronto-regra" style="color: #ffffff;">Palmeiras vs Flamengo RJ</strong>
+                    </span>
+                    <span id="badge-concordancia-regra" class="badge-concordancia concordam-sim">
+                        Verificando...
+                    </span>
+                </div>
+
+                <!-- Grade com Lado a Lado -->
+                <div class="grade-comparativo-regras">
+                    <!-- Coluna Regra Fixa -->
+                    <div class="coluna-regra coluna-regra-fixa">
+                        <div class="cabecalho-coluna">
+                            <span class="nome-metodo">Regra Fixa Heurística (Sem IA)</span>
+                            <span style="font-size: 0.75rem; color: #fbbf24; font-weight: 700;">Acurácia Histórica: 44.10%</span>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.78rem; color: var(--texto-suave);">PALPITE CALCULADO:</div>
+                            <div class="valor-palpite-comparativo" id="palpite-regra-fixa" style="color: #fbbf24;">Carregando...</div>
+                        </div>
+                        <div class="detalhe-logica-regra" id="explicacao-regra-fixa">
+                            Calculando lógica da regra fixa...
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--texto-suave);">
+                            Critério: <code>(Pontos Mandante + 0.35 mando) - Pontos Visitante</code>. Diferença &gt; 0.40 = Casa; &lt; -0.40 = Fora; senão Empate.
+                        </div>
+                    </div>
+
+                    <!-- Coluna Machine Learning -->
+                    <div class="coluna-regra coluna-ml">
+                        <div class="cabecalho-coluna">
+                            <span class="nome-metodo" id="nome-metodo-ml">Machine Learning (V1 • Random Forest)</span>
+                            <span style="font-size: 0.75rem; color: #4ade80; font-weight: 700;" id="acuracia-ml-badge">Acurácia Real: 50.24%</span>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.78rem; color: var(--texto-suave);">PALPITE DA IA:</div>
+                            <div class="valor-palpite-comparativo" id="palpite-ml-ia" style="color: #4ade80;">Carregando...</div>
+                        </div>
+                        <div class="detalhe-logica-regra" id="detalhes-ml-ia">
+                            Processando probabilidades...
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--texto-suave);" id="vantagem-ia-rotulo">
+                            Vantagem de acurácia sobre a regra fixa: <strong>+6.14%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bloco de Conclusão Técnica -->
+                <div class="bloco-conclusao-comparativo" id="conclusao-comparativo-texto">
+                    Carregando análise técnica comparativa...
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CARD 2: PREVISÃO NUMÉRICA / FORECAST DE GOLS (/forecast) ==================== -->
+        <section class="card-secao-tecnica recolhido" id="card-forecast" aria-label="Previsão Numérica de Gols">
+            <div class="topo-card-tecnico" onclick="alternarCardTecnico('card-forecast')">
+                <div>
+                    <h2 class="titulo-card-tecnico">2. Previsão Numérica Contínua (Regressão / Forecast)</h2>
+                    <p class="descricao-card-tecnico">
+                        Modelo de regressão supervisionada dedicado a estimar o total contínuo de gols da partida e a expectativa de cada equipe.
+                    </p>
+                </div>
+                <div class="acoes-topo-card">
+                    <a id="link-externo-forecast" href="http://127.0.0.1:8000/forecast?time_casa=Palmeiras&time_fora=Flamengo%20RJ&versao=v1" target="_blank" rel="noopener noreferrer" class="link-rota-externa" onclick="event.stopPropagation()" title="Abrir JSON puro desta rota diretamente em uma nova aba do navegador">
+                        <span>🔗 Abrir Rota JSON</span>
+                        <span class="url-rota-tag" id="tag-url-forecast">GET /forecast</span>
+                        <span>↗</span>
+                    </a>
+                    <button type="button" class="botao-abre-fecha-card" aria-label="Alternar exibição do card">
+                        <span class="texto-abre-fecha">Abrir</span>
+                        <span class="seta-abre-fecha">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="corpo-card-tecnico">
+                <div class="grade-forecast">
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Total de Gols Esperados</span>
+                        <strong class="forecast-valor" id="forecast-total-gols" style="color: #38bdf8;">--</strong>
+                        <span class="forecast-sub">Expectativa contínua do Regressor</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Placar Mais Provável</span>
+                        <strong class="forecast-valor" id="forecast-placar" style="color: #4ade80;">--</strong>
+                        <span class="forecast-sub" id="forecast-divisao-gols">Mandante vs Visitante</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Mercado de Gols</span>
+                        <strong class="forecast-valor" id="forecast-mercado" style="font-size: 1.05rem; color: #fbbf24;">--</strong>
+                        <span class="forecast-sub">Linha padrão Over / Under 2.5</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Erro Médio Absoluto (MAE)</span>
+                        <strong class="forecast-valor" id="forecast-mae">1.19 gols</strong>
+                        <span class="forecast-sub">Desvio médio no teste real (2024+)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CARD 3: MODEL-INFO E ENGENHARIA DE FEATURES (/model-info) ==================== -->
+        <section class="card-secao-tecnica recolhido" id="card-model-info" aria-label="Ficha Técnica do Modelo">
+            <div class="topo-card-tecnico" onclick="alternarCardTecnico('card-model-info')">
+                <div>
+                    <h2 class="titulo-card-tecnico">3. Especificação do Modelo &amp; Features Utilizadas</h2>
+                    <p class="descricao-card-tecnico">
+                        Metadados completos do modelo ativo em memória, hiperparâmetros de treinamento e catálogo das features de entrada.
+                    </p>
+                </div>
+                <div class="acoes-topo-card">
+                    <a id="link-externo-model-info" href="http://127.0.0.1:8000/model-info?versao=v1" target="_blank" rel="noopener noreferrer" class="link-rota-externa" onclick="event.stopPropagation()" title="Abrir JSON puro desta rota diretamente em uma nova aba do navegador">
+                        <span>🔗 Abrir Rota JSON</span>
+                        <span class="url-rota-tag" id="tag-url-model-info">GET /model-info</span>
+                        <span>↗</span>
+                    </a>
+                    <button type="button" class="botao-abre-fecha-card" aria-label="Alternar exibição do card">
+                        <span class="texto-abre-fecha">Abrir</span>
+                        <span class="seta-abre-fecha">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="corpo-card-tecnico">
+                <!-- Ficha Sintética -->
+                <div class="grade-forecast" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Algoritmo Classificador</span>
+                        <strong style="font-size: 0.92rem; color: #ffffff;" id="info-classificador">--</strong>
+                        <span class="forecast-sub">Classificação de resultado (H / D / A)</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Algoritmo Regressor</span>
+                        <strong style="font-size: 0.92rem; color: #ffffff;" id="info-regressor">--</strong>
+                        <span class="forecast-sub">Expectativa contínua de gols</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Total de Features</span>
+                        <strong class="forecast-valor" id="info-total-features" style="color: #38bdf8;">--</strong>
+                        <span class="forecast-sub">Variáveis simultâneas de entrada</span>
+                    </div>
+
+                    <div class="card-forecast-item">
+                        <span class="forecast-label">Acurácia no Teste Real</span>
+                        <strong class="forecast-valor" id="info-acuracia-real" style="color: #4ade80;">--</strong>
+                        <span class="forecast-sub" id="info-total-jogos">Validação em 1039 jogos de 2024+</span>
+                    </div>
+                </div>
+
+                <!-- Catálogo de Features Usadas -->
+                <div>
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
+                        Catálogo de Features Ativas (<span id="contador-features">13</span> variáveis):
+                    </h3>
+                    <div class="grade-features" id="grade-features-container">
+                        <!-- Preenchido dinamicamente pelo painel_tecnico.js -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CARD 4: EXPLICAÇÃO DA DECISÃO VIA ÁRVORE (/explain) ==================== -->
+        <section class="card-secao-tecnica recolhido" id="card-explain" aria-label="Explicação da Árvore de Decisão">
+            <div class="topo-card-tecnico" onclick="alternarCardTecnico('card-explain')">
+                <div>
+                    <h2 class="titulo-card-tecnico">4. Explicação da Decisão via Árvore (<code>/explain</code>)</h2>
+                    <p class="descricao-card-tecnico">
+                        Interpretabilidade da IA: caminho de cortes da Árvore de Decisão e peso das variáveis que justificam por que o time vence.
+                    </p>
+                </div>
+                <div class="acoes-topo-card">
+                    <a id="link-externo-explain" href="http://127.0.0.1:8000/explain?time_casa=Palmeiras&time_fora=Flamengo%20RJ&versao=v1" target="_blank" rel="noopener noreferrer" class="link-rota-externa" onclick="event.stopPropagation()" title="Abrir JSON puro desta rota diretamente em uma nova aba do navegador">
+                        <span>🔗 Abrir Rota JSON</span>
+                        <span class="url-rota-tag" id="tag-url-explain">GET /explain</span>
+                        <span>↗</span>
+                    </a>
+                    <button type="button" class="botao-abre-fecha-card" aria-label="Alternar exibição do card">
+                        <span class="texto-abre-fecha">Abrir</span>
+                        <span class="seta-abre-fecha">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="corpo-card-tecnico">
+                <!-- Pergunta Respondida e Decisão Final -->
+                <div class="caixa-pergunta-explain">
+                    <div>
+                        <div style="font-size: 0.76rem; color: #38bdf8; font-weight: 700; text-transform: uppercase;">
+                            PERGUNTA RESPONDIDA PELA ÁRVORE (<span id="explain-tipo-modelo">Random Forest V1</span>):
+                        </div>
+                        <div style="font-size: 1.02rem; font-weight: 700; color: #ffffff; margin-top: 3px;" id="explain-pergunta">
+                            Carregando pergunta...
+                        </div>
+                    </div>
+                    <span class="badge-concordancia concordam-sim" id="explain-decisao-badge">
+                        Decisão: --
+                    </span>
+                </div>
+
+                <!-- Caminho Passo a Passo da Árvore (Galhos) -->
+                <div>
+                    <h3 style="font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
+                        🌳 Caminho de Decisão da Árvore (Regras Acionadas Passo a Passo):
+                    </h3>
+                    <div class="grade-passos-arvore" id="explain-passos-container">
+                        <!-- Preenchido dinamicamente pelo painel_tecnico.js -->
+                    </div>
+                </div>
+
+                <!-- Top 5 Fatores Mais Importantes -->
+                <div>
+                    <h3 style="font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
+                        📊 Top 5 Variáveis de Maior Peso na Decisão:
+                    </h3>
+                    <div class="lista-fatores-explain" id="explain-fatores-container">
+                        <!-- Preenchido dinamicamente pelo painel_tecnico.js -->
+                    </div>
+                </div>
+
+                <!-- Resumo em Linguagem Humana -->
+                <div class="bloco-conclusao-comparativo" id="explain-resumo-texto">
+                    Carregando explicação detalhada da árvore...
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CARD 5: SEGMENTAÇÃO AUTOMÁTICA K-MEANS (/cluster) ==================== -->
+        <section class="card-secao-tecnica recolhido" id="card-cluster" aria-label="Segmentação K-Means dos Clubes">
+            <div class="topo-card-tecnico" onclick="alternarCardTecnico('card-cluster')">
+                <div>
+                    <h2 class="titulo-card-tecnico">5. Segmentação K-Means dos Clubes (<code>/cluster</code>)</h2>
+                    <p class="descricao-card-tecnico">
+                        Agrupamento automático não-supervisionado de todos os 38 clubes do Brasileirão em 4 perfis estatísticos por força de ataque e aproveitamento.
+                    </p>
+                </div>
+                <div class="acoes-topo-card">
+                    <a id="link-externo-cluster" href="http://127.0.0.1:8000/cluster?time_casa=Palmeiras&time_fora=Flamengo%20RJ" target="_blank" rel="noopener noreferrer" class="link-rota-externa" onclick="event.stopPropagation()" title="Abrir JSON puro desta rota diretamente em uma nova aba do navegador">
+                        <span>🔗 Abrir Rota JSON</span>
+                        <span class="url-rota-tag" id="tag-url-cluster">GET /cluster</span>
+                        <span>↗</span>
+                    </a>
+                    <button type="button" class="botao-abre-fecha-card" aria-label="Alternar exibição do card">
+                        <span class="texto-abre-fecha">Abrir</span>
+                        <span class="seta-abre-fecha">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="corpo-card-tecnico">
+                <!-- Destaque dos Clubes do Confronto Selecionado -->
+                <div class="caixa-pergunta-explain" style="border-left-color: #10b981;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <span style="font-size: 0.76rem; color: #10b981; font-weight: 700; text-transform: uppercase;">
+                            ENQUADRAMENTO DO CONFRONTO ATUAL NO K-MEANS:
+                        </span>
+                        <div style="font-size: 0.95rem; color: #ffffff;" id="cluster-confronto-texto">
+                            Carregando enquadramento dos times...
+                        </div>
+                    </div>
+                    <span class="badge-concordancia concordam-sim" id="badge-cluster-comparativo">
+                        Escalão: --
+                    </span>
+                </div>
+
+                <!-- Imagem do Gráfico Gerado com Todos os Times -->
+                <div>
+                    <h3 style="font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 8px;">
+                        📈 Mapa Visual de Dispersão K-Means (Todos os 38 Clubes Agrupados):
+                    </h3>
+                    <img src="grafico_clusters_kmeans.png" alt="Gráfico K-Means dos Clubes do Brasileirão" class="imagem-grafico-cluster" />
+                </div>
+
+                <!-- Grade com a Lista Completa dos Clubes em Cada Cluster -->
+                <div>
+                    <h3 style="font-size: 0.92rem; font-weight: 700; color: #ffffff; margin-bottom: 10px;">
+                        📋 Catálogo Completo dos Clubes por Cluster:
+                    </h3>
+                    <div class="grade-grupos-clusters" id="cluster-grupos-container">
+                        <!-- Preenchido dinamicamente pelo painel_tecnico.js -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="rodape-transparencia">
+        ML-Palpites • Sistema Preditivo de Futebol • Brasileirão Série A • API FastAPI &amp; Machine Learning
+    </footer>
+
+    <!-- Script de lógica do Painel Técnico -->
+    <script src="painel_tecnico.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+PROJETO FINAL
+PredictAPI — API Inteligente de Decisão com Machine Learning
+CENÁRIO REAL (FOCO EM NEGÓCIO)
+Uma empresa quer integrar IA no seu sistema, mas não precisa de interface
+complexa nem banco agora.
+Ela precisa de algo direto:
+Uma API que receba dados e responda com decisões inteligentes em tempo real.
+Exemplo real:
+● CRM → chama API → recebe previsão
+● E-commerce → chama API → decide oferta
+● Marketing → usa API → segmenta clientes
+OBJETIVO
+Desenvolver uma API REST de Machine Learning profissional, capaz de:
+● Prever comportamento (classificação)
+● Segmentar dados (clustering)
+● Gerar previsões (forecast)
+● Explicar decisões
+● Comparar modelos (clássico vs rede neural)
+ARQUITETURA SIMPLIFICADA (SEM BANCO)
+ESCOPO DO PROJETO
+1. DATASET
+Pode ser:
+● Gerado com numpy/pandas
+ou
+● CSV simples (clientes, vendas, etc.)
+Exemplo:
+● idade
+● renda
+● histórico de compras
+● target: comprou ou não
+2. TREINAMENTO DOS MODELOS
+Criar scripts separados:
+train.py
+Responsável por:
+● Treinar modelo de classificação
+● Treinar árvore de decisão
+● Treinar K-Means
+● Treinar rede neural simples
+● Salvar modelos (.pkl)
+3. API (CORE DO PROJETO)
+Usar FastAPI
+ENDPOINTS OBRIGATÓRIOS
+/predict (CLASSIFICAÇÃO)
+/predict-rule
+Mesmo problema usando regra fixa:
+Permite comparação direta com ML
+/cluster
+Retorna cluster do cliente:
+{
+"cluster": 1,
+"perfil": "Cliente VIP"
+}
+/forecast
+Prevê valor futuro (ex: vendas)
+/model-info
+Retorna:
+● Tipo do modelo
+● Métricas
+● Features usadas
+/explain
+Explica decisão usando árvore:
+“Por que esse cliente vai comprar?”
+MÓDULOS (OBRIGATÓRIOS)
+1. Regra Fixa vs ML
+Comparação via endpoint
+2. Classificação (Scikit-Learn)
+● Logistic Regression ou RandomForest
+● Métricas calculadas no treino
+3. Árvore de Decisão
+● Interpretável
+● Usada no /explain
+4. K-Means
+Segmentação automática
+5. Previsão
+Modelo simples (regressão)
+6. Rede Neural vs Modelo Clássico
+Comparação clara:
+● Qual performa melhor?
+● Qual é mais rápido?
+7. (OPCIONAL) Visão Computacional
+● Teachable Machine
+ou
+● TensorFlow.js
+8. (OPCIONAL) Fala
+● SpeechRecognition
+TESTES (IMPORTANTE)
+Usar:
+● Postman
+ou
+● Swagger automático do FastAPI
+Testar TODOS endpoints
+FRONTEND (BÔNUS)
+Se quiserem subir o nível:
+● Interface simples com:
+○ Formulário de previsão
+○ Resultado em tempo real
+Pode ser:
+● HTML + JS
+ou
+● React

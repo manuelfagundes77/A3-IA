@@ -4,6 +4,7 @@ from api.modelos import carregar_modelos
 from api.rotas.rota_times import roteador as roteador_times
 from api.rotas.rota_previsao import roteador as roteador_previsao
 from api.rotas.rota_metricas import roteador as roteador_metricas
+from api.rotas.rota_cluster import roteador as roteador_cluster
 
 # Criar a aplicação FastAPI
 app = FastAPI(
@@ -49,6 +50,7 @@ def ao_iniciar():
 app.include_router(roteador_times)
 app.include_router(roteador_previsao)
 app.include_router(roteador_metricas)
+app.include_router(roteador_cluster)
 
 # Rota raiz (health check)
 @app.get("/")

@@ -14,7 +14,7 @@
 - **Arquitetura Geral:**
   - 🤖 **ML (Machine Learning):** Scikit-Learn com Random Forest treinado com histórico temporal (2012-2023) e validado em dados reais (2024+).
   - ⚡ **Backend:** FastAPI (Python), servindo predições e estatísticas via endpoints REST em formato JSON.
-  - 💻 **Frontend (Próxima etapa):** React SPA para visualização interativa, seleção de times e exibição de métricas.
+  - 💻 **Frontend (Próxima etapa):** Interface Web leve e pura (**HTML5 + CSS3 + Vanilla JS**) consumindo a API REST com seletor ao vivo entre V1 (Random Forest) e V2 (XGBoost).
 
 ---
 
@@ -33,6 +33,7 @@ A3 IA/
 ├── gemini.md                     # Memória viva do projeto para a IA (este arquivo)
 ├── README_IA.md                  # Contexto inicial e diretrizes gerais
 ├── api.md                        # Especificação técnica e contratos dos endpoints
+├── front.md                      # Planejamento arquitetural e visual do Frontend (HTML/CSS/JS)
 ├── COMO_RODAR.md                 # Guia prático de comandos de terminal
 ├── requirements.txt              # Dependências gerais do projeto (API + ML V1 + ML V2)
 ├── .gitignore                    # Bloqueio de subida de arquivos desnecessários pro GitHub
@@ -113,8 +114,17 @@ A3 IA/
        - **Média:** probabilidade máxima entre 50% e 60%.
        - **Baixa:** probabilidade máxima < 50%.
        - **Campos adicionais para o mockup:** `placar_provavel` (ex: "1 x 1"), `media_gols_casa`, `media_gols_fora` e `confianca_pct`.
-  5. `GET /api/metricas?versao=v1`: Lê `resultados_teste_vX.csv` e retorna dinamicamente a taxa de acerto real e o erro médio de gols.
+  5. `GET /api/metricas?versao=v1` e `GET /model-info?versao=v1`: Lê `resultados_teste_vX.csv` e retorna dinamicamente a taxa de acerto real, erro médio de gols, tipo de modelo e a lista completa de features usadas.
+  6. `POST /predict`: Alias do endpoint de classificação de vencedor e gols.
+  7. `POST /forecast`: Previsão contínua exclusiva do modelo de regressão (`regressor_gols.pkl`), expectativa de gols e mercado Over/Under 2.5.
+  8. `POST /predict-rule`: Compara o mesmo confronto resolvido por uma regra heurística fixa (`if / else` de momento e mando de campo) contra o Machine Learning, comprovando a superioridade da IA (+6.14% na V1 / +7.97% na V2).
+  9. `POST` e `GET /explain`: Explica passo a passo por que a Árvore de Decisão escolheu o vencedor da partida (`caminho_arvore` de 4 passos + Top 5 fatores mais importantes), funcionando tanto na V1 quanto na V2 sem retreinar os `.pkl`.
+  10. `POST` e `GET /cluster`: Segmentação não-supervisionada via **K-Means (`n_clusters=4`)** agrupando os 38 clubes do Brasileirão em 4 perfis estatísticos (Elite, Forte Mandante, Meio de Tabela e Zona de Alerta) e servindo a imagem do gráfico de dispersão com todos os clubes.
   - Versão inexistente retorna **HTTP 404** com mensagem clara.
+
+### 4.3. Módulo Frontend Web (Interface Principal + Painel Técnico)
+- **Simulador Principal (`frontend/index.html`, `app.js`):** Interface fiel ao mockup editorial esportivo dark mode, com seleção ao vivo de times, chaveador V1/V2 e botão de atalho `⚙️ Painel Técnico`.
+- **Painel Técnico de Diagnóstico (`frontend/painel_tecnico.html`, `painel_tecnico.js`):** Tela dedicada aos requisitos da avaliação com inspeção de `/predict-rule`, `/forecast`, `/model-info`, `/explain` e `/cluster`, cards retráteis (que iniciam fechados por padrão deixando apenas o título e o link JSON), mapa visual de dispersão K-Means com todos os clubes (`grafico_clusters_kmeans.png`), links diretos para o JSON puro e navegação bidirecional sincronizada por URL.
 
 ---
 
@@ -124,9 +134,10 @@ A3 IA/
 |---|---|---|---|
 | 1 | ML V1 | Treinamento, 13 features e salvamento de `.pkl` | ✅ Concluído |
 | 2 | Gráficos/Relatórios | Matrizes de confusão e relatórios visuais | ✅ Concluído |
-| 3 | Backend API | FastAPI com rotas `/api/times`, `/api/previsao` e `/api/metricas` | ✅ Concluído |
-| 4 | Frontend | Interface React consumindo a API com visual moderno | 🔄 **A Fazer** |
-| 5 | ML V2 | Pasta autônoma `ml/v2/` com XGBoost (500 árvores) e 16 features (Odds Bet365/Mercado) | ✅ Concluído |
+| 3 | Backend API | FastAPI com rotas `/api/times`, `/api/previsao` e `/api/metricas` (V1 e V2) | ✅ Concluído |
+| 4 | Frontend | Interface Web (`HTML + CSS + JS`) em `frontend/` fiel ao `mockup_taste.jpg` | ✅ Concluído |
+| 5 | ML V2 | Pasta autônoma `ml/v2/` com XGBoost (1000 árvores) e 25 features (Odds + Diferenciais) | ✅ Concluído |
+| 6 | Painel Técnico & Endpoints | Implementação de `/predict-rule`, `/forecast`, `/model-info`, `/predict` e tela `painel_tecnico.html` | ✅ Concluído |
 
 ---
 
@@ -173,6 +184,10 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 | **13/10/2026** | Equipe / IA | Preparação para o GitHub | Criação do `.gitignore` (bloqueando `venv`, `__pycache__` e temporários) e atualização do `api/requirements.txt` com inclusão do `xgboost` para suportar V1 e V2. |
 | **13/10/2026** | Usuário / IA | Preferência por GitHub Desktop | Salva regra permanente: o usuário utiliza exclusivamente o GitHub Desktop (GUI); a IA nunca deve executar nem propor comandos `git` no terminal. |
 | **13/10/2026** | Usuário / IA | Centralização do requirements.txt | Movido e organizado `requirements.txt` na raiz do projeto (cobrindo FastAPI, ML V1 e V2 com seções comentadas), facilitando instalação direta e leitura por IAs e ambientes. |
+| **22/10/2026** | Equipe / IA | Planejamento do Frontend (`front.md`) | Decisão arquitetural de utilizar **HTML5 + CSS3 + JavaScript Puro (Vanilla JS)** em arquivos separados (`index.html`, `estilo.css`, `app.js`) em vez de React, sem instalações extras. Planejado seletor interativo V1 (Random Forest) vs V2 (XGBoost) com ficha técnica do modelo ativo. |
+| **22/10/2026** | Equipe / IA | Implementação do Frontend (`frontend/`) e Integração V2 na API | Criados `frontend/index.html`, `frontend/estilo.css` e `frontend/app.js` seguindo `mockup_taste.jpg` e `especifica_o_de_interface_preditor_brasileir_o_ia.md`, com quadrado cinza `"Aguardando imagem"` para escudos, cores fixas (Casa = Verde, Empate = Âmbar, Fora = Vermelho) e seletor V1/V2 com ficha técnica do modelo. Ajustados `api/modelos.py` e `api/rotas/rota_previsao.py` para suportar as 25 features da V2 (XGBoost). |
+| **26/10/2026** | Equipe / IA | Requisitos do Professor & Painel Técnico | Implementados os endpoints obrigatórios do documento do professor: `POST /predict-rule` (comparativo Regra Fixa vs ML), `POST /forecast` (previsão numérica e mercado Over/Under), `GET /model-info` (metadados, tipo de modelo e catálogo de 13/25 features) e alias `POST /predict`. Criado botão "⚙️ Painel Técnico" na página principal e desenvolvida a tela `frontend/painel_tecnico.html` + `painel_tecnico.js` com links diretos para abrir o JSON puro no navegador e navegação sincronizada por URL. |
+| **26/10/2026** | Equipe / IA | Implementação do Módulo K-Means (`/cluster`) | Criado script separado `ml/treino_cluster.py` agrupando os 38 clubes do Brasileirão em 4 clusters com K-Means (Scikit-Learn) e gerado gráfico Dark Mode com todos os clubes (`frontend/grafico_clusters_kmeans.png`). Criada rota isolada `api/rotas/rota_cluster.py` (`POST` e `GET /cluster`) e adicionado Card 5 retrátil no Painel Técnico. |
 
 ---
 

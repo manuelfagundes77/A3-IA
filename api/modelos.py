@@ -13,10 +13,19 @@ VERSAO_PADRAO = "v1"
 modelos_por_versao = {}
 
 
+def obter_pasta_modelos(versao):
+    """Retorna o caminho da pasta de modelos de acordo com a versão."""
+    if versao == "v2":
+        pasta_v2 = os.path.join(CAMINHO_ML, 'v2', 'modelos')
+        if os.path.exists(pasta_v2):
+            return pasta_v2
+    return os.path.join(CAMINHO_ML, f'modelos_{versao}')
+
+
 def carregar_modelos():
     """Carrega os arquivos .pkl de todas as versões disponíveis na memória, uma única vez."""
     for versao in VERSOES_SUPORTADAS:
-        pasta = os.path.join(CAMINHO_ML, f'modelos_{versao}')
+        pasta = obter_pasta_modelos(versao)
         try:
             with open(os.path.join(pasta, 'classificador_vencedor.pkl'), 'rb') as f:
                 classificador = pickle.load(f)
@@ -71,4 +80,8 @@ def obter_caminho_ml():
 
 def obter_caminho_resultados(versao=VERSAO_PADRAO):
     """Retorna o caminho do CSV de resultados do teste real da versão."""
+    if versao == "v2":
+        caminho_v2 = os.path.join(CAMINHO_ML, 'v2', 'resultados_teste.csv')
+        if os.path.exists(caminho_v2):
+            return caminho_v2
     return os.path.join(CAMINHO_ML, f'resultados_teste_{versao}.csv')

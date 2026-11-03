@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ML-Palpites | Simulador Preditivo do Brasileirão (IA)</title>
+    <!-- Fonte Inter para visual Editorial Esportivo de alto contraste -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="estilo.css" />
+</head>
+<body>
+
+    <!-- ==================== CABEÇALHO SUPERIOR ==================== -->
+    <header class="cabecalho-topo">
+        <div class="cabecalho-conteudo">
+            <div class="marca-container">
+                <!-- Ícone M geométrico inspirado no mockup -->
+                <svg class="icone-marca" viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M2 25V4L11.5 16.5L16 10.5" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 10.5L20.5 16.5L30 4V25" stroke="#18A963" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="titulo-marca">ML-PALPITES</span>
+                <span class="divisor-marca">|</span>
+                <span class="subtitulo-marca">Brasileirão Match Predictor • Série A</span>
+            </div>
+
+            <!-- Seletor de Versão do Modelo (V1 vs V2) e Atalho ao Painel Técnico -->
+            <div class="acoes-cabecalho">
+                <div class="seletor-versao-container" role="group" aria-label="Selecionar Versão do Modelo de IA">
+                    <span class="rotulo-seletor-versao">Motor de IA:</span>
+                    <button type="button" id="btn-versao-v1" class="botao-versao ativo" onclick="selecionarVersaoModelo('v1')">
+                        <span class="ponto-versao"></span>
+                        V1 • Random Forest
+                    </button>
+                    <button type="button" id="btn-versao-v2" class="botao-versao" onclick="selecionarVersaoModelo('v2')">
+                        <span class="ponto-versao"></span>
+                        V2 • XGBoost + Odds
+                    </button>
+                </div>
+
+                <a href="painel_tecnico.html" id="link-painel-tecnico" class="botao-painel-tecnico" title="Acessar comparativo de Regra Fixa, Forecast e Ficha Técnica">
+                    <span class="icone-painel">⚙️</span>
+                    Painel Técnico
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== FICHA TÉCNICA COMPLETA DO MODELO ATIVO ==================== -->
+    <section class="faixa-ficha-modelo" aria-label="Especificação Completa do Modelo de Machine Learning">
+        <div class="ficha-topo-linha">
+            <span class="badge-versao" id="ficha-badge-versao">MODELO V1 ATIVO</span>
+            <strong class="ficha-algoritmo" id="ficha-nome-algoritmo">Random Forest (Classifier &amp; Regressor)</strong>
+            <span class="ficha-separador">•</span>
+            <span class="ficha-detalhes" id="ficha-parametros">200 árvores (max_depth=7) • 13 features históricas</span>
+        </div>
+
+        <!-- Pílulas de Métricas Completas do Modelo -->
+        <div class="ficha-grade-pilulas">
+            <div class="pilula-metrica" title="Taxa de acerto do modelo durante o aprendizado nos dados de 2012 a 2023">
+                <span class="metrica-rotulo">Acurácia Treino (2012–23):</span>
+                <strong class="metrica-valor destaque-azul" id="ficha-acuracia-treino">57.07%</strong>
+            </div>
+            <div class="pilula-metrica" title="Taxa de acerto em jogos reais inéditos de 2024 em diante">
+                <span class="metrica-rotulo">Acurácia Real (2024+):</span>
+                <strong class="metrica-valor destaque-verde" id="ficha-acuracia">50.24%</strong>
+            </div>
+            <div class="pilula-metrica" title="Vantagem da IA sobre o chute aleatório de 3 resultados (33.33%)">
+                <span class="metrica-rotulo">Ganho vs Sorte (33.3%):</span>
+                <strong class="metrica-valor destaque-verde" id="ficha-ganho-sorte">+16.91%</strong>
+            </div>
+            <div class="pilula-metrica" title="Erro médio absoluto na previsão do total de gols da partida">
+                <span class="metrica-rotulo">Erro Médio (MAE):</span>
+                <strong class="metrica-valor" id="ficha-erro-gols">1.19 gols</strong>
+            </div>
+            <div class="pilula-metrica" title="Quantidade de partidas reais de 2024+ usadas na validação">
+                <span class="metrica-rotulo">Validação Real:</span>
+                <strong class="metrica-valor" id="ficha-total-jogos">1039 jogos</strong>
+            </div>
+        </div>
+
+        <p class="ficha-descricao-features" id="ficha-explicacao-features">
+            <strong>Engenharia de Features:</strong> Momento recente (últimos 5 jogos: GF, GA, Pts), Confronto Direto (H2H) e Média Histórica de Mando de Campo.
+        </p>
+    </section>
+
+    <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
+    <main class="container-principal">
+
+        <!-- 1. CARD DE SELEÇÃO DE CONFRONTO -->
+        <section class="card-painel card-selecao" aria-label="Seleção de Confronto">
+            <div class="grade-selecao-times">
+
+                <!-- Lado Esquerdo: Time Mandante (CASA = VERDE) -->
+                <div class="caixa-time caixa-mandante">
+                    <div class="quadrado-imagem-placeholder" aria-label="Espaço para o escudo do time mandante">
+                        <span>Aguardando<br/>imagem</span>
+                    </div>
+                    <div class="info-seletor-time">
+                        <div class="envelope-select">
+                            <select id="select-time-casa" class="select-clube" aria-label="Selecionar Time Mandante" onchange="aoTrocarTimeSelecionado()">
+                                <option value="">Carregando times...</option>
+                            </select>
+                            <span class="seta-select" aria-hidden="true">⌄</span>
+                        </div>
+                        <span class="tag-mando tag-casa">
+                            <span class="bolinha-cor bolinha-verde"></span>
+                            Casa (Mandante)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Divisor Central Compacto: VS e Botão Inverter (não espreme os cards laterais) -->
+                <div class="divisor-central-vs">
+                    <div class="linha-vs-controles">
+                        <div class="circulo-vs">VS</div>
+                        <button type="button" id="btn-inverter-times" class="botao-inverter" onclick="inverterTimesSelecionados()" title="Inverter Mandante e Visitante">
+                            ⇄
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lado Direito: Time Visitante (FORA = VERMELHO) -->
+                <div class="caixa-time caixa-visitante">
+                    <div class="quadrado-imagem-placeholder" aria-label="Espaço para o escudo do time visitante">
+                        <span>Aguardando<br/>imagem</span>
+                    </div>
+                    <div class="info-seletor-time">
+                        <div class="envelope-select">
+                            <select id="select-time-fora" class="select-clube" aria-label="Selecionar Time Visitante" onchange="aoTrocarTimeSelecionado()">
+                                <option value="">Carregando times...</option>
+                            </select>
+                            <span class="seta-select" aria-hidden="true">⌄</span>
+                        </div>
+                        <span class="tag-mando tag-fora">
+                            <span class="bolinha-cor bolinha-vermelha"></span>
+                            Fora (Visitante)
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Linha informativa do confronto centralizada abaixo dos cards -->
+            <div class="resumo-confronto-barra" id="legenda-mando-campo">
+                Selecione os clubes para simular o confronto
+            </div>
+
+            <!-- Botão de Execução -->
+            <button type="button" id="btn-calcular-palpite" class="botao-calcular" onclick="calcularPalpiteComIA()">
+                CALCULAR PALPITE COM IA
+            </button>
+
+            <!-- Mensagem de erro / aviso (oculta por padrão) -->
+            <p id="mensagem-alerta" class="mensagem-alerta oculto"></p>
+        </section>
+
+        <!-- 2. CARD DE PREDIÇÃO DO MODELO (IA) -->
+        <section id="secao-predicao" class="card-painel card-predicao" aria-live="polite">
+            <div class="cabecalho-predicao">
+                <div>
+                    <h1 class="titulo-predicao">PREDIÇÃO DO MODELO (IA)</h1>
+                    <p class="subtitulo-palpite" id="texto-palpite-ia">Selecione dois clubes e clique em calcular</p>
+                </div>
+                <div class="badge-confianca confianca-alta" id="badge-confianca-ia">
+                    Acurácia do Modelo: <strong id="valor-confianca-ia">50.24% (Treino: 57.07%)</strong>
+                </div>
+            </div>
+
+            <!-- Barras Horizontais de Probabilidade -->
+            <div class="lista-barras-probabilidade">
+
+                <!-- Barra 1: Vitória Mandante (SEMPRE VERDE) -->
+                <div class="item-barra">
+                    <div class="topo-barra">
+                        <span class="rotulo-barra" id="rotulo-barra-casa">Vitória do Mandante (Casa)</span>
+                        <strong class="percentual-barra" id="pct-barra-casa">0.0%</strong>
+                    </div>
+                    <div class="trilha-barra">
+                        <div class="preenchimento-barra barra-casa-verde" id="barra-progresso-casa" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Barra 2: Empate (SEMPRE ÂMBAR / DOURADO) -->
+                <div class="item-barra">
+                    <div class="topo-barra">
+                        <span class="rotulo-barra">Empate</span>
+                        <strong class="percentual-barra" id="pct-barra-empate">0.0%</strong>
+                    </div>
+                    <div class="trilha-barra">
+                        <div class="preenchimento-barra barra-empate-ambar" id="barra-progresso-empate" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Barra 3: Vitória Visitante (SEMPRE VERMELHO) -->
+                <div class="item-barra">
+                    <div class="topo-barra">
+                        <span class="rotulo-barra" id="rotulo-barra-fora">Vitória do Visitante (Fora)</span>
+                        <strong class="percentual-barra" id="pct-barra-fora">0.0%</strong>
+                    </div>
+                    <div class="trilha-barra">
+                        <div class="preenchimento-barra barra-fora-vermelho" id="barra-progresso-fora" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Grade Inferior: 3 Caixas de Métricas (Fiel ao Mockup) -->
+            <div class="grade-metricas-inferiores">
+
+                <!-- Card 1: Média de Gols Mandante -->
+                <div class="card-metrica-jogo">
+                    <span class="titulo-card-metrica" id="titulo-media-casa">Média de Gols (Casa)</span>
+                    <strong class="numero-card-metrica" id="valor-media-casa">0.00</strong>
+                    <span class="detalhe-card-metrica" id="detalhe-raiox-casa">Últ. 5 jogos: 0.0 pró • 0.0 sofridos • 0.0 pts</span>
+                </div>
+
+                <!-- Card 2: Placar Mais Provável (Destaque Central com Borda Clara) -->
+                <div class="card-metrica-jogo card-placar-destaque">
+                    <span class="titulo-card-metrica">Placar Mais Provável</span>
+                    <strong class="numero-card-metrica" id="valor-placar-provavel">0 × 0</strong>
+                    <span class="detalhe-card-metrica" id="detalhe-total-gols">Expectativa total: 0.00 gols</span>
+                </div>
+
+                <!-- Card 3: Média de Gols Visitante -->
+                <div class="card-metrica-jogo">
+                    <span class="titulo-card-metrica" id="titulo-media-fora">Média de Gols (Fora)</span>
+                    <strong class="numero-card-metrica" id="valor-media-fora">0.00</strong>
+                    <span class="detalhe-card-metrica" id="detalhe-raiox-fora">Últ. 5 jogos: 0.0 pró • 0.0 sofridos • 0.0 pts</span>
+                </div>
+
+            </div>
+
+            <!-- Faixa de Retrospecto Direto (H2H) -->
+            <div class="faixa-retrospecto-h2h">
+                <span class="titulo-h2h">Confronto Direto Recente (H2H):</span>
+                <div class="itens-h2h">
+                    <span class="item-h2h"><span class="bolinha-cor bolinha-verde"></span> Mandante: <strong id="h2h-casa-pct">0%</strong></span>
+                    <span class="item-h2h"><span class="bolinha-cor bolinha-ambar"></span> Empates: <strong id="h2h-empate-pct">0%</strong></span>
+                    <span class="item-h2h"><span class="bolinha-cor bolinha-vermelha"></span> Visitante: <strong id="h2h-fora-pct">0%</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. RODAPÉ DE TRANSPARÊNCIA E DESEMPENHO DA IA -->
+        <footer class="rodape-transparencia" id="rodape-metricas-ia">
+            Carregando métricas de validação em dados reais (2024+)...
+        </footer>
+
+    </main>
+
+    <!-- Script de integração com a API FastAPI -->
+    <script src="app.js"></script>
+</body>
+</html>
