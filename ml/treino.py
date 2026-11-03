@@ -12,6 +12,14 @@ from config_versoes import (
     arquivo_resultados_teste, bloquear_se_protegida
 )
 
+# Parâmetros do modelo (V1 - Random Forest | 13 Features)
+N_ESTIMATORS = 200      # 200 árvores de decisão para dar estabilidade nas previsões
+MAX_DEPTH = 7           # Limite de profundidade para evitar overfitting (não decorar jogos passados)
+RANDOM_STATE = 42       # Semente fixa para o resultado ser sempre igual em qualquer computador
+ANO_CORTE_TESTE = 2024  # Treino de 2012 a 2023 e teste de 2024 em diante (evita vazamento de dados futuros)
+JOGOS_MOMENTO = 5       # Analisa os últimos 5 jogos de cada time para calcular a fase atual
+JOGOS_H2H = 5           # Analisa os últimos 5 confrontos diretos entre as duas equipes
+
 def calcular_features_e_historico(df):
     times = pd.concat([df['Home'], df['Away']]).unique()
 
@@ -38,18 +46,18 @@ def calcular_features_e_historico(df):
             historico_h2h[equipes] = []
 
         # --- FEATURE 1: Momento Atual (Últimos 5 jogos de cada time) ---
-        home_games = historico_times[home][-5:]
-        home_gf  = sum([g['gf'] for g in home_games]) / 5 if len(home_games) > 0 else 0
-        home_ga  = sum([g['ga'] for g in home_games]) / 5 if len(home_games) > 0 else 0
-        home_pts = sum([g['pts'] for g in home_games]) / 5 if len(home_games) > 0 else 0
+        home_games = historico_times[home][-JOGOS_MOMENTO:]
+        home_gf  = sum([g['gf'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0
+        home_ga  = sum([g['ga'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0
+        home_pts = sum([g['pts'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0
 
-        away_games = historico_times[away][-5:]
-        away_gf  = sum([g['gf'] for g in away_games]) / 5 if len(away_games) > 0 else 0
-        away_ga  = sum([g['ga'] for g in away_games]) / 5 if len(away_games) > 0 else 0
-        away_pts = sum([g['pts'] for g in away_games]) / 5 if len(away_games) > 0 else 0
+        away_games = historico_times[away][-JOGOS_MOMENTO:]
+        away_gf  = sum([g['gf'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0
+        away_ga  = sum([g['ga'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0
+        away_pts = sum([g['pts'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0
 
         # --- FEATURE 2: Confronto Direto (Últimos 5 jogos entre ELES) ---
-        h2h_games = historico_h2h[equipes][-5:]
+        h2h_games = historico_h2h[equipes][-JOGOS_H2H:]
         if len(h2h_games) > 0:
             h2h_home_wins = sum([1 for g in h2h_games if g['winner'] == home]) / len(h2h_games)
             h2h_away_wins = sum([1 for g in h2h_games if g['winner'] == away]) / len(h2h_games)
@@ -132,8 +140,8 @@ def main():
     print("Calculando features jogo a jogo... (Pode levar alguns segundos)")
     dados_com_features, historico_times, historico_em_casa, historico_fora, historico_h2h = calcular_features_e_historico(dados)
 
-    dados_treino = dados_com_features[dados_com_features['Season'] < 2024].copy()
-    dados_teste  = dados_com_features[dados_com_features['Season'] >= 2024].copy()
+    dados_treino = dados_com_features[dados_com_features['Season'] < ANO_CORTE_TESTE].copy()
+    dados_teste  = dados_com_features[dados_com_features['Season'] >= ANO_CORTE_TESTE].copy()
 
     features = [
         # Momento atual
@@ -154,10 +162,10 @@ def main():
     y_reg_treino   = dados_treino['total_gols']
 
     print("Treinando Random Forest com 13 features...")
-    classificador_vencedor = RandomForestClassifier(n_estimators=200, max_depth=7, random_state=42)
+    classificador_vencedor = RandomForestClassifier(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH, random_state=RANDOM_STATE)
     classificador_vencedor.fit(X_treino, y_class_treino)
 
-    regressor_gols = RandomForestRegressor(n_estimators=200, max_depth=7, random_state=42)
+    regressor_gols = RandomForestRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH, random_state=RANDOM_STATE)
     regressor_gols.fit(X_treino, y_reg_treino)
 
     # Salvar modelos e histórico completo na pasta da versão ativa

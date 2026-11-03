@@ -1,0 +1,17 @@
+# Treinar e gerar gráficos da V1 (Random Forest)
+python ml/treino.py
+python ml/relatorio_visual.py
+
+# Treinar e gerar gráficos da V2 (XGBoost)
+python ml/v2/treino.py
+python ml/v2/relatorio_visual.py
+
+# Treinar e gerar gráfico do K-Means (Clusters)
+python ml/treino_cluster.py
+
+# Iniciar API
+uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Instalar dependencias python
+pip install -r requirements.txt
+python -m pip install -r requirements.txt

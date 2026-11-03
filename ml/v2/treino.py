@@ -16,6 +16,22 @@ except ImportError:
 
 from sklearn.metrics import accuracy_score, mean_absolute_error
 
+# Parâmetros do modelo (V2 - XGBoost | 25 Features com Odds e Diferenciais)
+N_ESTIMATORS = 1000     # 1000 árvores sequenciais (cada árvore corrige o erro da anterior)
+LEARNING_RATE = 0.01    # Taxa de aprendizado baixa (aprende devagar para ter mais precisão)
+MAX_DEPTH_CLASS = 6     # Profundidade máxima do classificador de vencedor (equilíbrio anti-overfitting)
+MAX_DEPTH_REG = 5       # Profundidade máxima do regressor de gols
+SUBSAMPLE = 0.8         # Usa 80% dos jogos por árvore para não viciar nos mesmos exemplos
+COLSAMPLE_BYTREE = 0.8  # Usa 80% das colunas por árvore para forçar o uso de todas as estatísticas
+GAMMA = 1.0             # Exige ganho mínimo antes de criar um novo galho na árvore (poda)
+REG_LAMBDA = 5.0        # Regularização L2 para suavizar os pesos e evitar overfitting
+REG_ALPHA = 1.0         # Regularização L1 para zerar variáveis que não ajudam na decisão
+MIN_CHILD_WEIGHT = 3    # Mínimo de exemplos necessários em uma folha para validar a regra
+RANDOM_STATE = 42       # Semente fixa para o resultado ser sempre igual em qualquer computador
+ANO_CORTE_TESTE = 2024  # Treino de 2012 a 2023 e teste de 2024 em diante (evita vazamento de dados futuros)
+JOGOS_MOMENTO = 5       # Analisa os últimos 5 jogos de cada time para calcular a fase atual
+JOGOS_H2H = 5           # Analisa os últimos 5 confrontos diretos entre as duas equipes
+
 # Definição de caminhos locais da V2
 PASTA_ATUAL = os.path.dirname(os.path.abspath(__file__))
 PASTA_ML = os.path.dirname(PASTA_ATUAL)
@@ -38,18 +54,18 @@ def extrair_features_linha(home, away, historico_times, historico_times_em_casa,
     equipes = tuple(sorted([home, away]))
 
     # 1. Momento Atual (Últimos 5 jogos)
-    home_games = historico_times.get(home, [])[-5:]
-    home_gf = sum([g['gf'] for g in home_games]) / 5 if len(home_games) > 0 else 0.0
-    home_ga = sum([g['ga'] for g in home_games]) / 5 if len(home_games) > 0 else 0.0
-    home_pts = sum([g['pts'] for g in home_games]) / 5 if len(home_games) > 0 else 0.0
+    home_games = historico_times.get(home, [])[-JOGOS_MOMENTO:]
+    home_gf = sum([g['gf'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0.0
+    home_ga = sum([g['ga'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0.0
+    home_pts = sum([g['pts'] for g in home_games]) / JOGOS_MOMENTO if len(home_games) > 0 else 0.0
 
-    away_games = historico_times.get(away, [])[-5:]
-    away_gf = sum([g['gf'] for g in away_games]) / 5 if len(away_games) > 0 else 0.0
-    away_ga = sum([g['ga'] for g in away_games]) / 5 if len(away_games) > 0 else 0.0
-    away_pts = sum([g['pts'] for g in away_games]) / 5 if len(away_games) > 0 else 0.0
+    away_games = historico_times.get(away, [])[-JOGOS_MOMENTO:]
+    away_gf = sum([g['gf'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0.0
+    away_ga = sum([g['ga'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0.0
+    away_pts = sum([g['pts'] for g in away_games]) / JOGOS_MOMENTO if len(away_games) > 0 else 0.0
 
     # 2. Confronto Direto H2H (Últimos 5 jogos entre eles)
-    h2h_games = historico_h2h.get(equipes, [])[-5:]
+    h2h_games = historico_h2h.get(equipes, [])[-JOGOS_H2H:]
     if len(h2h_games) > 0:
         h2h_home_wins = sum([1 for g in h2h_games if g['winner'] == home]) / len(h2h_games)
         h2h_away_wins = sum([1 for g in h2h_games if g['winner'] == away]) / len(h2h_games)
@@ -373,11 +389,11 @@ def main():
     dados_com_features['total_gols'] = dados_com_features['HG'] + dados_com_features['AG']
     dados_com_features.dropna(subset=features + ['total_gols', 'Res'], inplace=True)
 
-    dados_treino = dados_com_features[dados_com_features['Season'] < 2024].copy()
-    dados_teste = dados_com_features[dados_com_features['Season'] >= 2024].copy()
+    dados_treino = dados_com_features[dados_com_features['Season'] < ANO_CORTE_TESTE].copy()
+    dados_teste = dados_com_features[dados_com_features['Season'] >= ANO_CORTE_TESTE].copy()
 
-    print(f"Jogos no Treino (< 2024): {len(dados_treino)}")
-    print(f"Jogos no Teste Real (>= 2024): {len(dados_teste)}")
+    print(f"Jogos no Treino (< {ANO_CORTE_TESTE}): {len(dados_treino)}")
+    print(f"Jogos no Teste Real (>= {ANO_CORTE_TESTE}): {len(dados_teste)}")
 
     X_treino = dados_treino[features]
     y_class_treino = dados_treino['Res'].map(MAPA_CLASSES)
@@ -390,16 +406,16 @@ def main():
     # Treinamento do Classificador com Parada Antecipada (Early Stopping)
     print("\nTreinando XGBoost Classifier com Tuning Otimizado...")
     classificador_vencedor = XGBClassifier(
-        n_estimators=1000,
-        max_depth=6,
-        learning_rate=0.01,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        gamma=1.0,
-        reg_lambda=5.0,
-        reg_alpha=1.0,
-        min_child_weight=3,
-        random_state=42,
+        n_estimators=N_ESTIMATORS,
+        max_depth=MAX_DEPTH_CLASS,
+        learning_rate=LEARNING_RATE,
+        subsample=SUBSAMPLE,
+        colsample_bytree=COLSAMPLE_BYTREE,
+        gamma=GAMMA,
+        reg_lambda=REG_LAMBDA,
+        reg_alpha=REG_ALPHA,
+        min_child_weight=MIN_CHILD_WEIGHT,
+        random_state=RANDOM_STATE,
         eval_metric='mlogloss'
     )
     classificador_vencedor.fit(X_treino, y_class_treino)
@@ -407,14 +423,14 @@ def main():
     # Treinamento do Regressor de Gols
     print("Treinando XGBoost Regressor de Gols...")
     regressor_gols = XGBRegressor(
-        n_estimators=1000,
-        max_depth=5,
-        learning_rate=0.01,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        gamma=1.0,
-        reg_lambda=5.0,
-        random_state=42
+        n_estimators=N_ESTIMATORS,
+        max_depth=MAX_DEPTH_REG,
+        learning_rate=LEARNING_RATE,
+        subsample=SUBSAMPLE,
+        colsample_bytree=COLSAMPLE_BYTREE,
+        gamma=GAMMA,
+        reg_lambda=REG_LAMBDA,
+        random_state=RANDOM_STATE
     )
     regressor_gols.fit(X_treino, y_reg_treino)
 
