@@ -1,56 +1,61 @@
-# Comandos Úteis - ML-Palpites
+# 🚀 Como Rodar o Projeto (ML-Palpites)
 
-Guarde este arquivo para sempre lembrar dos comandos essenciais de navegação e inicialização do projeto no terminal.
+Todos os comandos abaixo foram feitos para serem rodados **diretamente na pasta raiz do projeto (`A3 IA`)**, sem precisar ficar entrando e saindo de pastas no terminal.
 
 ---
 
-## 1. Como Ligar a API (Servidor)
+## 1. Ligar a API (Servidor Backend)
 
-Abra o terminal e certifique-se de estar na **pasta raiz** do projeto (a pasta `A3 IA`). Em seguida, copie e cole o comando abaixo:
+Abra o terminal na pasta raiz (`A3 IA`) e rode:
 
 ```bash
 uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-- **Como testar:** Assim que aparecer "Application startup complete", abra seu navegador e acesse [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
-'http://127.0.0.1:8000/api/times'
-- **Como desligar:** Para parar a API, clique no terminal e pressione `CTRL + C`.
+- **Documentação da API (Swagger):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Para desligar a API:** clique no terminal e aperte `CTRL + C`.
 
 ---
 
-## 2. Navegando pelo Terminal (Entrar e Voltar de Pastas)
+## 2. Abrir o Frontend (HTML no Navegador)
 
-O terminal é exigente com os caminhos. Aqui está como você se movimenta por ele:
+Com a API ligada no passo 1, você tem duas formas simples de abrir o sistema:
 
-### ⏪ Voltar para a pasta anterior
-Se o seu terminal mostrar que você está dentro da pasta `ml` (ex: `C:\Users\Manuel\Desktop\A3 IA\ml>`) e você quer **voltar para a pasta principal**, use o comando:
-c
-```bash
-cd ..
-```
-*(Lembrete: tem que ter um espaço entre a letra 'd' e os pontinhos).*
-
-### ⏩ Entrar em uma pasta
-Para entrar na pasta `ml` para treinar a IA, por exemplo:
-
-```bash
-cd ml
-```
-
-### 🧠 Dica de Ouro
-Se você tentar rodar o comando `python treino.py` estando na pasta raiz, ele vai dar erro dizendo que não achou o arquivo. Você precisa sempre entrar na pasta certa (`cd ml`) e só depois rodar o comando!
-
+- **Pelo Windows (Mais fácil):** Abra a pasta `frontend` e dê **dois cliques** no arquivo `index.html`.
+- **Pelo Terminal (na pasta raiz):**
+  ```bash
+  start frontend/index.html
+  ```
 
 ---
 
-## 3. Instalação (Primeiro Acesso / Baixado do GitHub)
+## 3. Rodar Novamente o Treino da IA (V1 e V2)
 
-Se você acabou de baixar este projeto do GitHub em outro PC, você precisará instalar as dependências (bibliotecas) para que os arquivos funcionem.
+Se quiser retreinar os modelos e atualizar os gráficos, basta rodar os comandos abaixo direto da pasta raiz (`A3 IA`):
 
-Certifique-se de ter o Python instalado. Então, abra o terminal na **pasta raiz** do projeto (`A3 IA`) e execute:
+### 🔹 Treinar a Versão 1 (Random Forest - 13 Features)
+```bash
+python ml/treino.py
+```
+*(Para atualizar também os gráficos de teste real da V1, rode: `python ml/relatorio_visual.py`)*
+
+### 🔸 Treinar a Versão 2 (XGBoost com Odds - 25 Features)
+```bash
+python ml/v2/treino.py
+```
+*(Para atualizar também os gráficos de teste real da V2, rode: `python ml/v2/relatorio_visual.py`)*
+
+### 📊 Atualizar o Agrupamento K-Means (Clusters)
+```bash
+python ml/treino_cluster.py
+```
+
+---
+
+## 4. Instalar Dependências (Apenas na 1ª vez ou em outro PC)
+
+Se baixou o projeto em um computador novo, instale todas as bibliotecas de uma vez rodando na pasta raiz:
 
 ```bash
 pip install -r requirements.txt
 ```
-
-*(Isso instalará automaticamente todas as dependências da API e do Machine Learning: fastapi, uvicorn, pandas, scikit-learn, numpy, matplotlib e xgboost)*
