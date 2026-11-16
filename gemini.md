@@ -151,17 +151,20 @@ uvicorn api.main:app --host 127.0.0.1 --port 8000 --reload
 - Documentação interativa Swagger: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - Endpoint de times: [http://127.0.0.1:8000/api/times](http://127.0.0.1:8000/api/times)
 
-### Retreinar o Modelo de Machine Learning:
+### Retreinar o Modelo de Machine Learning (direto da pasta raiz):
 * **Versão V1 (Random Forest):**
   ```bash
-  cd ml
-  python treino.py
+  python ml/treino.py
+  python ml/relatorio_visual.py
   ```
 * **Versão V2 (XGBoost com Odds):**
   ```bash
-  cd ml/v2
-  python treino.py
-  python relatorio_visual.py
+  python ml/v2/treino.py
+  python ml/v2/relatorio_visual.py
+  ```
+* **Agrupamento K-Means (Clusters):**
+  ```bash
+  python ml/treino_cluster.py
   ```
 
 ---
